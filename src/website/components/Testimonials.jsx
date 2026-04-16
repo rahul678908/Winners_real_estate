@@ -1,25 +1,31 @@
-const testimonials = [
-  {
-    name: "Ali Tufan",
-    role: "Marketing",
-    image: "https://randomuser.me/api/portraits/women/44.jpg",
-    text: "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti.",
-  },
-  {
-    name: "Albert Flores",
-    role: "Designer",
-    image: "https://randomuser.me/api/portraits/men/32.jpg",
-    text: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.",
-  },
-  {
-    name: "Robert Fox",
-    role: "Developer",
-    image: "https://randomuser.me/api/portraits/men/45.jpg",
-    text: "Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore.",
-  },
-];
+import { useEffect, useState } from "react";
+import { fetchTestimonials } from "../services/testimonialService";
 
 function Testimonials() {
+  const [testimonials, setTestimonials] = useState([]);
+
+  useEffect(() => {
+    loadTestimonials();
+  }, []);
+
+  const loadTestimonials = async () => {
+    try {
+      const data = await fetchTestimonials();
+
+      // 🔹 Map API → UI format
+      const formatted = data.map((item) => ({
+        name: item.name,
+        role: item.role || "User", // fallback
+        image: item.image || "https://via.placeholder.com/150",
+        text: item.message,
+      }));
+
+      setTestimonials(formatted);
+    } catch (error) {
+      console.error("Error fetching testimonials:", error);
+    }
+  };
+
   return (
     <div className="bg-gray-100 py-16 px-6">
       <div className="max-w-7xl mx-auto text-center">
@@ -29,7 +35,7 @@ function Testimonials() {
           People Love Living With Realtor
         </h2>
         <p className="text-gray-500 mb-10">
-          Aliquam lacinia diam quis lacus euismod
+          Customers we have helped find their dream homes and what they have to say about us.
         </p>
 
         {/* Cards */}

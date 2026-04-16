@@ -10,6 +10,8 @@ import CarouselManagement from "./pages/CarouselManagement";
 import LocationManagement from "./pages/LocationManagement";
 import PropertyListManagement from "./pages/PropertiesListManagement";
 import UsersManagement from "./pages/UserManagement";
+import TestimonialsManagement from "./pages/TestimonialManagement";
+
 function AdminRoutes() {
     return (
             <Routes>
@@ -23,6 +25,7 @@ function AdminRoutes() {
                 <Route path="/roles-permissions" element={<RolesPermissions />} />
                 <Route path="/website-management/carousel" element={<CarouselManagement />} />
                 <Route path="/website-management/location" element={<LocationManagement />} />
+                <Route path="/website-management/testimonials" element={<TestimonialsManagement />} />
                 <Route path="/properties/list" element={<PropertyListManagement />} />
                 <Route path="/users" element={<UsersManagement />} />
                 {/* Future admin routes can be added here */}
