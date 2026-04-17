@@ -16,9 +16,25 @@ export const getPermissions = async () => {
 };
 
 
+
+
+
 // =============================
 // 🔹 ROLES
 // =============================
+
+
+// GET all roles
+export const getRoles = async () => {
+  try {
+    const res = await api.get("/roles/list/");
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching roles:", error);
+    throw error;
+  }
+};
+
 
 // CREATE role
 export const createRole = async (name) => {

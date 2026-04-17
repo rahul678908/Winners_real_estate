@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   getPermissions, createRole, updateRole,
-  deleteRole, assignRoleToUser,
+  deleteRole, assignRoleToUser, getRoles
 } from "../services/RolesPermission";
 
 const MODAL = { NONE: null, CREATE: "create", EDIT: "edit", DELETE: "delete", ASSIGN: "assign" };
@@ -18,11 +18,25 @@ export default function RolesPermissions() {
   const [assignUserId, setAssignUserId] = useState("");
   const [toast, setToast] = useState("");
 
-  useEffect(() => { fetchPermissions(); }, []);
+  useEffect(() => {
+    fetchAll();
+  }, []);
 
   const fetchPermissions = async () => {
     try { setPermissions(await getPermissions()); }
     catch (err) { console.error(err); }
+  };
+
+    const fetchAll = async () => {
+    try {
+      const perms = await getPermissions();
+      const rolesData = await getRoles();
+
+      setPermissions(perms);
+      setRoles(rolesData);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const showToast = (msg) => {
@@ -36,14 +50,20 @@ export default function RolesPermissions() {
   const openCreateModal = () => {
     setNewRoleName(""); setCreatePerms([]); setModal(MODAL.CREATE);
   };
+
   const handleCreate = async () => {
     if (!newRoleName.trim()) return;
-    const data = await createRole(newRoleName);
-    // If your API supports setting permissions on create, pass createPerms too
-    setRoles([...roles, { ...data, permissions: createPerms }]);
+
+    await createRole({
+      name: newRoleName,
+      permissions: createPerms, // ✅ send to backend
+    });
+
+    await fetchAll(); // 🔥 VERY IMPORTANT
     setModal(MODAL.NONE);
     showToast(`Role "${newRoleName}" created`);
   };
+
   const toggleCreatePerm = (id) =>
     setCreatePerms((p) => p.includes(id) ? p.filter((x) => x !== id) : [...p, id]);
 
@@ -53,12 +73,15 @@ export default function RolesPermissions() {
     setEditPerms(role.permissions || []);
     setModal(MODAL.EDIT);
   };
+
   const handleUpdate = async () => {
     await updateRole(selectedRoleId, selectedRole.name, editPerms);
-    setRoles(roles.map((r) => r.id === selectedRoleId ? { ...r, permissions: editPerms } : r));
+
+    await fetchAll(); // 🔥 FIX
     setModal(MODAL.NONE);
     showToast("Permissions updated");
   };
+
   const toggleEditPerm = (id) =>
     setEditPerms((p) => p.includes(id) ? p.filter((x) => x !== id) : [...p, id]);
 
@@ -66,9 +89,12 @@ export default function RolesPermissions() {
   const openDeleteModal = (id) => { setPendingDeleteId(id); setModal(MODAL.DELETE); };
   const handleDelete = async () => {
     const role = roles.find((r) => r.id === pendingDeleteId);
+
     await deleteRole(pendingDeleteId);
-    setRoles(roles.filter((r) => r.id !== pendingDeleteId));
+    await fetchAll(); // 🔥 FIX
+
     if (selectedRoleId === pendingDeleteId) setSelectedRoleId(null);
+
     setModal(MODAL.NONE);
     showToast(`Role "${role.name}" deleted`);
   };
