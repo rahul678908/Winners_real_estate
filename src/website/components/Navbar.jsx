@@ -3,13 +3,15 @@ import { useState, useEffect } from "react";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
 import { FaArrowRight, FaPlusCircle, FaUserCircle } from "react-icons/fa";
 import AuthModal from "../pages/AuthModal";
+import PropertySubmitModal from "./PropertySubmitModal";
 import logo from "../../assets/winner_logo-1.png";
-import { clearUserTokens } from "../utils/userAuthStorage";
+import { logoutUser, getUsername, getUserAccessToken } from "../utils/userAuthStorage";
 
 function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const [propertyModalOpen, setPropertyModalOpen] = useState(false);
   const [open, setOpen] = useState(false); // auth modal
   const [menuOpen, setMenuOpen] = useState(false); // mobile menu
 
@@ -26,9 +28,10 @@ function Navbar() {
     { name: "Contact Us", path: "/contact" },
   ];
 
-  useEffect(() => {
-    const token = localStorage.getItem("user_access_token");
-    const storedUsername = localStorage.getItem("username");
+  // Function to load auth state from localStorage
+  const loadAuthState = () => {
+    const token = getUserAccessToken();
+    const storedUsername = getUsername();
 
     if (token && storedUsername) {
       setIsLoggedIn(true);
@@ -37,11 +40,28 @@ function Navbar() {
       setIsLoggedIn(false);
       setUsername("");
     }
+  };
+
+  useEffect(() => {
+    // Load auth state on component mount
+    loadAuthState();
+
+    // Listen for storage changes (useful for multi-tab sync)
+    const handleStorageChange = (e) => {
+      if (e.key === "user_access_token" || e.key === "username") {
+        loadAuthState();
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
   const handleLogout = () => {
-    clearUserTokens();
-    localStorage.removeItem("username");
+    logoutUser();
     setIsLoggedIn(false);
     setUsername("");
     setMenuOpen(false);
@@ -115,11 +135,18 @@ function Navbar() {
             )}
 
             {/* Desktop Add Property */}
-            <button className="hidden md:flex bg-white text-black px-5 py-2.5 rounded-full items-center gap-2 font-semibold text-[14px] hover:bg-[#f5d2b1] transition shadow-md">
-              <FaPlusCircle size={14} />
-              Add Property
-              <FaArrowRight size={11} />
-            </button>
+              <button
+                onClick={() => {
+                  if (!isLoggedIn) {
+                    setOpen(true); // login modal
+                  } else {
+                    setPropertyModalOpen(true);
+                  }
+                }}
+                className="hidden md:flex bg-white text-black px-5 py-2.5 rounded-full items-center gap-2 font-semibold"
+              >
+                Add Property
+              </button>
 
             {/* Mobile Hamburger */}
             <button
@@ -205,7 +232,16 @@ function Navbar() {
               </>
             )}
 
-            <button className="w-full bg-white text-black py-3 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-[#f5d2b1] transition shadow-md">
+            <button onClick={() => {
+              if (!isLoggedIn) {
+                setOpen(true);
+                setMenuOpen(false);
+              } else {
+                setPropertyModalOpen(true);
+                setMenuOpen(false);
+              }
+            }}
+             className="w-full bg-white text-black py-3 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-[#f5d2b1] transition shadow-md">
               <FaPlusCircle size={14} />
               Add Property
               <FaArrowRight size={11} />
@@ -216,6 +252,9 @@ function Navbar() {
 
       {/* AUTH MODAL */}
       <AuthModal isOpen={open} onClose={() => setOpen(false)} />
+
+      {/* PROPERTY SUBMIT MODAL */}
+      <PropertySubmitModal isOpen={propertyModalOpen} onClose={() => setPropertyModalOpen(false)} />
     </>
   );
 }

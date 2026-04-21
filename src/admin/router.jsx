@@ -11,6 +11,9 @@ import LocationManagement from "./pages/LocationManagement";
 import PropertyListManagement from "./pages/PropertiesListManagement";
 import UsersManagement from "./pages/UserManagement";
 import TestimonialsManagement from "./pages/TestimonialManagement";
+import PropertySubmissionsList from "./pages/PropertySubmissionsList";
+import PropertySubmissionDetail from "./pages/PropertySubmissionDetail";
+
 
 function AdminRoutes() {
     return (
@@ -28,6 +31,8 @@ function AdminRoutes() {
                 <Route path="/website-management/testimonials" element={<TestimonialsManagement />} />
                 <Route path="/properties/list" element={<PropertyListManagement />} />
                 <Route path="/users" element={<UsersManagement />} />
+                <Route path="/properties/submissions" element={<PropertySubmissionsList />} />
+                <Route path="/properties/submissions/:id" element={<PropertySubmissionDetail />} />
                 {/* Future admin routes can be added here */}
               </Route>
             </Routes>

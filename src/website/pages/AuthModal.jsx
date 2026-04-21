@@ -13,7 +13,7 @@ import {
   loginUser,
   forgotPassword,
 } from "../services/authService";
-import { saveUserTokens } from "../utils/userAuthStorage";
+import { saveUserTokens, saveUsername } from "../utils/userAuthStorage";
 
 function AuthModal({ isOpen, onClose, message = "" }) {
   const [view, setView] = useState("login");
@@ -57,12 +57,22 @@ function AuthModal({ isOpen, onClose, message = "" }) {
       }
 
       const res = await loginUser(loginData);
+      
+      console.log("Login response:", res);
 
-      // if backend returns access + refresh
-      saveUserTokens(res.access, res.refresh);
+      // Handle different response structures
+      const accessToken = res.access || res.access_token || res.token;
+      const refreshToken = res.refresh || res.refresh_token;
 
-      // save username for navbar
-      localStorage.setItem("username", res.username || loginData.username);
+      if (!accessToken) {
+        console.error("No access token in response:", res);
+        setError("Login failed: No token received from server.");
+        return;
+      }
+
+      // Save tokens and username for persistent login
+      saveUserTokens(accessToken, refreshToken);
+      saveUsername(res.username || loginData.username);
       
       setSuccess("Login successful!");
       setTimeout(() => {
@@ -70,7 +80,7 @@ function AuthModal({ isOpen, onClose, message = "" }) {
         window.location.reload();
       }, 1000);
     } catch (err) {
-      console.error(err);
+      console.error("Login error:", err);
       setError(
         err.response?.data?.detail ||
           err.response?.data?.message ||

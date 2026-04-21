@@ -17,6 +17,27 @@ export const clearUserTokens = () => {
   localStorage.removeItem("user_refresh_token");
 };
 
+// ================= USER INFO =================
+export const saveUsername = (username) => {
+  if (username) {
+    localStorage.setItem("username", username);
+  }
+};
+
+export const getUsername = () => {
+  return localStorage.getItem("username");
+};
+
+export const clearUsername = () => {
+  localStorage.removeItem("username");
+};
+
+// ================= USER LOGOUT =================
+export const logoutUser = () => {
+  clearUserTokens();
+  clearUsername();
+};
+
 // ================= ADMIN TOKENS =================
 export const saveAdminTokens = (access, refresh) => {
   localStorage.setItem("admin_access_token", access);

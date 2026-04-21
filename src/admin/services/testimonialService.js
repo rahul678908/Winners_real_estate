@@ -1,14 +1,14 @@
-import api from "./api";
+import AdminApi from "./api";
 
 // 🔹 GET all testimonials
 export const fetchTestimonials = async () => {
-  const res = await api.get("/testimonials/");
+  const res = await AdminApi.get("/testimonials/");
   return res.data;
 };
 
 // 🔹 CREATE testimonial
 export const createTestimonial = async (formData) => {
-  const res = await api.post("/testimonials/create/", formData, {
+  const res = await AdminApi.post("/testimonials/create/", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return res.data;
@@ -16,7 +16,7 @@ export const createTestimonial = async (formData) => {
 
 // 🔹 UPDATE testimonial
 export const updateTestimonial = async (id, formData) => {
-  const res = await api.put(`/testimonials/${id}/update/`, formData, {
+  const res = await AdminApi.put(`/testimonials/${id}/update/`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return res.data;
@@ -24,6 +24,6 @@ export const updateTestimonial = async (id, formData) => {
 
 // 🔹 DELETE testimonial
 export const deleteTestimonial = async (id) => {
-  const res = await api.delete(`/testimonials/${id}/delete/`);
+  const res = await AdminApi.delete(`/testimonials/${id}/delete/`);
   return res.data;
 };

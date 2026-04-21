@@ -32,6 +32,26 @@ export default function PropertiesManagement() {
           </p>
         </div>
 
+        <div
+          onClick={() => navigate("/admin/properties/submissions")}
+          className="bg-white rounded-3xl shadow-md p-6 border border-slate-200 
+                    hover:shadow-xl transition-all duration-300 cursor-pointer 
+                    hover:-translate-y-1"
+        >
+          <div className="w-14 h-14 rounded-2xl bg-slate-900 text-white flex items-center justify-center mb-4">
+            <Plus size={26} />
+          </div>
+
+          <h2 className="text-xl font-bold text-slate-900 mb-2">
+            View All Properties
+          </h2>
+
+          <p className="text-slate-600 text-sm">
+            View all submitted properties from users.
+          </p>
+        </div>
+
+
         {/* Future */}
         <div className="bg-white rounded-3xl shadow-md p-6 border border-slate-200 opacity-70">
           <div className="w-14 h-14 rounded-2xl bg-slate-300 text-white flex items-center justify-center mb-4">

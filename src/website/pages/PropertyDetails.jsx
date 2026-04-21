@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getPropertyDetail } from "../services/propertyService";
 import AuthModal from "./AuthModal";
+import { getUserAccessToken } from "../utils/userAuthStorage";
 import {
   BedDouble,
   Bath,
@@ -31,7 +32,7 @@ function PropertyDetails() {
       setLoading(true);
 
       // ✅ CHECK TOKEN FIRST
-      const token = localStorage.getItem("user_access_token");
+      const token = getUserAccessToken();
 
       if (!token) {
         setAuthMessage("You are not logged in. Please login to view more details.");
@@ -67,6 +68,16 @@ function PropertyDetails() {
     }
   };
 
+  // ✅ Handle auth modal close - re-check auth and retry if logged in
+  const handleAuthModalClose = () => {
+    setShowAuthModal(false);
+    // Re-check if user logged in and retry fetching property details
+    const token = getUserAccessToken();
+    if (token) {
+      fetchPropertyDetail();
+    }
+  };
+
   if (loading) {
     return (
       <div className="py-20 text-center text-gray-500 text-lg">
@@ -81,7 +92,7 @@ function PropertyDetails() {
       <>
         <AuthModal
           isOpen={showAuthModal}
-          onClose={() => setShowAuthModal(false)}
+          onClose={handleAuthModalClose}
           message={authMessage}
         />
 
@@ -119,7 +130,7 @@ function PropertyDetails() {
       {/* AUTH MODAL */}
       <AuthModal
         isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
+        onClose={handleAuthModalClose}
         message={authMessage}
       />
 

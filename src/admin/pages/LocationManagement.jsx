@@ -65,21 +65,17 @@ export default function LocationManagement() {
   const handleSubmit = async (payload) => {
     try {
       setLoading(true);
-
       if (modalMode === "edit" && selectedItem) {
         await updateLocation(selectedItem.id, payload);
-        Swal.fire("Updated!", "Location updated successfully", "success");
       } else {
         await createLocation(payload);
-        Swal.fire("Created!", "Location added successfully", "success");
       }
-
       setIsModalOpen(false);
       setSelectedItem(null);
       fetchLocations();
     } catch (error) {
-      console.error(error);
-      Swal.fire("Error", "Something went wrong", "error");
+      console.error("ERROR:", error.response?.data);
+      Swal.fire("Error", JSON.stringify(error.response?.data), "error");
     } finally {
       setLoading(false);
     }
@@ -124,9 +120,7 @@ export default function LocationManagement() {
           <h1 className="text-3xl font-bold text-slate-900">
             Location Management
           </h1>
-          <p className="text-slate-600 mt-1">
-            Manage website locations here.
-          </p>
+          <p className="text-slate-600 mt-1">Manage website locations here.</p>
         </div>
 
         <button
@@ -141,13 +135,15 @@ export default function LocationManagement() {
       {/* Table */}
       <div className="bg-white rounded-3xl shadow-md overflow-hidden border border-slate-200">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[950px]">
+          <table className="w-full min-w-[1100px]">
             <thead className="bg-slate-100">
               <tr>
                 <th className="text-left px-6 py-4 font-semibold text-slate-700">ID</th>
                 <th className="text-left px-6 py-4 font-semibold text-slate-700">Image</th>
                 <th className="text-left px-6 py-4 font-semibold text-slate-700">Name</th>
                 <th className="text-left px-6 py-4 font-semibold text-slate-700">Status</th>
+                <th className="text-left px-6 py-4 font-semibold text-slate-700">Properties</th>
+                <th className="text-left px-6 py-4 font-semibold text-slate-700">Created At</th>
                 <th className="text-left px-6 py-4 font-semibold text-slate-700">Actions</th>
               </tr>
             </thead>
@@ -155,13 +151,13 @@ export default function LocationManagement() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="5" className="text-center px-6 py-10 text-slate-500">
+                  <td colSpan="7" className="text-center px-6 py-10 text-slate-500">
                     Loading locations...
                   </td>
                 </tr>
               ) : locations.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="text-center px-6 py-10 text-slate-500">
+                  <td colSpan="7" className="text-center px-6 py-10 text-slate-500">
                     No locations found.
                   </td>
                 </tr>
@@ -171,30 +167,36 @@ export default function LocationManagement() {
                     key={item.id}
                     className="border-t border-slate-200 hover:bg-slate-50 transition"
                   >
-                    <td className="px-6 py-4 text-slate-800">{item.id}</td>
+                    {/* ID */}
+                    <td className="px-6 py-4 text-slate-500 text-sm">#{item.id}</td>
 
+                    {/* Image */}
                     <td className="px-6 py-4">
                       {item.image_url ? (
                         <img
                           src={item.image_url}
                           alt={item.name}
-                          className="w-24 h-14 object-cover rounded-xl border"
+                          className="w-24 h-14 object-cover rounded-xl border border-slate-200"
                         />
                       ) : (
-                        <div className="w-24 h-14 rounded-xl bg-slate-200 flex items-center justify-center text-slate-500 text-sm">
+                        <div className="w-24 h-14 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 text-xs">
                           No Image
                         </div>
                       )}
                     </td>
 
-                    <td className="px-6 py-4 font-medium text-slate-900 flex items-center gap-2">
-                      <MapPin size={16} className="text-slate-500" />
-                      {item.name}
+                    {/* Name */}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2 font-medium text-slate-900">
+                        <MapPin size={15} className="text-slate-400 shrink-0" />
+                        {item.name}
+                      </div>
                     </td>
 
+                    {/* Status */}
                     <td className="px-6 py-4">
                       <span
-                        className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
                           item.is_active
                             ? "bg-green-100 text-green-700"
                             : "bg-red-100 text-red-700"
@@ -204,27 +206,49 @@ export default function LocationManagement() {
                       </span>
                     </td>
 
+                    {/* Property Count */}
                     <td className="px-6 py-4">
-                      <div className="flex gap-3">
+                      <span className="inline-flex items-center justify-center bg-slate-100 text-slate-700 text-sm font-medium px-3 py-1 rounded-full">
+                        {item.property_count ?? 0}
+                      </span>
+                    </td>
+
+                    {/* Created At */}
+                    <td className="px-6 py-4 text-slate-500 text-sm">
+                      {item.created_at
+                        ? new Date(item.created_at).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })
+                        : "—"}
+                    </td>
+
+                    {/* Actions */}
+                    <td className="px-6 py-4">
+                      <div className="flex gap-2">
                         <button
                           onClick={() => handleView(item)}
-                          className="p-2 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition"
+                          className="p-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition"
+                          title="View"
                         >
-                          <Eye size={18} />
+                          <Eye size={16} />
                         </button>
 
                         <button
                           onClick={() => handleEdit(item)}
                           className="p-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition"
+                          title="Edit"
                         >
-                          <Pencil size={18} />
+                          <Pencil size={16} />
                         </button>
 
                         <button
                           onClick={() => handleDelete(item.id)}
                           className="p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition"
+                          title="Delete"
                         >
-                          <Trash2 size={18} />
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </td>

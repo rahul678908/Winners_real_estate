@@ -1,4 +1,4 @@
-import api from "./api";
+import AdminApi from "./api";
 
 // =============================
 // 🔹 PERMISSIONS
@@ -7,7 +7,7 @@ import api from "./api";
 // GET all permissions
 export const getPermissions = async () => {
   try {
-    const res = await api.get("/permissions/list/");
+    const res = await AdminApi.get("/permissions/list/");
     return res.data;
   } catch (error) {
     console.error("Error fetching permissions:", error);
@@ -27,7 +27,7 @@ export const getPermissions = async () => {
 // GET all roles
 export const getRoles = async () => {
   try {
-    const res = await api.get("/roles/list/");
+    const res = await AdminApi.get("/roles/list/");
     return res.data;
   } catch (error) {
     console.error("Error fetching roles:", error);
@@ -39,7 +39,7 @@ export const getRoles = async () => {
 // CREATE role
 export const createRole = async (name) => {
   try {
-    const res = await api.post("/roles/create/", { name });
+    const res = await AdminApi.post("/roles/create/", { name });
     return res.data;
   } catch (error) {
     console.error("Error creating role:", error);
@@ -50,7 +50,7 @@ export const createRole = async (name) => {
 // UPDATE role (name + permissions)
 export const updateRole = async (id, name, permissions) => {
   try {
-    const res = await api.put(`/roles/${id}/update/`, {
+    const res = await AdminApi.put(`/roles/${id}/update/`, {
       name,
       permissions,
     });
@@ -64,7 +64,7 @@ export const updateRole = async (id, name, permissions) => {
 // DELETE role
 export const deleteRole = async (id) => {
   try {
-    const res = await api.delete(`/roles/${id}/delete/`);
+    const res = await AdminApi.delete(`/roles/${id}/delete/`);
     return res.data;
   } catch (error) {
     console.error("Error deleting role:", error);
@@ -79,7 +79,7 @@ export const deleteRole = async (id) => {
 
 export const assignRoleToUser = async (user_id, role_id) => {
   try {
-    const res = await api.post("/assign-role/", {
+    const res = await AdminApi.post("/assign-role/", {
       user_id,
       role_id,
     });
